@@ -437,12 +437,143 @@ def maxProfit1_carl(prices: [int]) -> int:
 def maxProfit2_carl(prices: [int]) -> int:
     dp = [[0, -prices[0], 0, -prices[0], 0]] + [[0, 0, 0, 0, 0] for _ in range(1, len(prices))]
     for i in range(1, len(prices)):
-        dp[i][0] = dp[i - 1][0]  # 不操作
-        dp[i][1] = max(dp[i - 1][1], dp[i - 1][0] - prices[i])  # 第一次买入
-        dp[i][2] = max(dp[i - 1][2], dp[i - 1][1] + prices[i])  # 第一次卖出
-        dp[i][3] = max(dp[i - 1][3], dp[i - 1][2] - prices[i])  # 第二次买入
-        dp[i][4] = max(dp[i - 1][4], dp[i - 1][3] + prices[i])  # 第二次卖出
+        dp[i][0] = dp[i - 1][0]  # 不操作/保持状态
+        dp[i][1] = max(dp[i - 1][1], dp[i - 1][0] - prices[i])  # 第一次买入状态
+        dp[i][2] = max(dp[i - 1][2], dp[i - 1][1] + prices[i])  # 第一次卖出状态
+        dp[i][3] = max(dp[i - 1][3], dp[i - 1][2] - prices[i])  # 第二次买入状态
+        dp[i][4] = max(dp[i - 1][4], dp[i - 1][3] + prices[i])  # 第二次卖出状态
     return dp[-1][4]
+
+
+# 最多可以买卖k次，同一天只能持有一支股票,求可多次买卖的条件下，可获得的最大利润，可在同一天进行买入、卖出
+# 可买卖k次
+def maxProfit3_carl(k: int, prices: [int]) -> int:
+    # 买卖两次有5个状态，买卖k次有2k+1个状态，构造长度为2k+1的状态数组dp[i]
+    # 其中dp[i][0]表示不操作
+    # dp[i][j]j为奇数时表示买入，j为偶数时表示卖出
+    dp = [[0] + [0 if i % 2 == 0 else -prices[0] for i in range(1, 2 * k + 1)]] + [[0 for _ in range(2 * k + 1)] for _ in range(1, len(prices))]
+    for i in range(1, len(prices)):
+        for j in range(0, 2 * k - 1, 2):
+            # dp[i - 1][j + 1]上一天本次买入；dp[i - 1][j] - prices[i]上一次卖出-prices[i]
+            dp[i][j + 1] = max(dp[i - 1][j + 1], dp[i - 1][j] - prices[i])
+            # dp[i - 1][j + 2]上一天本次卖出；dp[i - 1][j + 1] + prices[i]本次买入+prices[i]
+            dp[i][j + 2] = max(dp[i - 1][j + 2], dp[i - 1][j + 1] + prices[i])
+    return max(dp[-1])
+
+
+# 含冷冻期，买卖股票，同一天只能持有一只股票
+# 可多次买卖
+def maxProfit4(prices: [int]) -> int:
+    dp = [[-prices[0], 0]] + [[0, 0] for _ in range(1, len(prices))]
+    # 状态压缩了，只保持了持有股票和不持有股票两种状态
+    for i in range(1, len(prices)):
+        if i == 1:
+            dp[i][0] = max(dp[i - 1][0], -prices[i])
+        else:
+            # 买入与前一天卖或不卖两种状态有关，要么保持买入，要么冷冻期过了买入
+            dp[i][0] = max(dp[i - 1][0], dp[i - 2][1] - prices[i])
+        # 卖出只有前一天卖出或者前一天买入有关，要么保持，要么当天卖
+        dp[i][1] = max(dp[i - 1][1], dp[i - 1][0] + prices[i])
+    return max(dp[-1][0], dp[-1][1])
+
+
+def maxProfit4_carl(prices: [int]) -> int:
+    # 四维数组表示四种状态
+    # 状态一：持有股票状态（今天买入股票，或者是之前就买入了股票然后没有操作，一直持有）
+    # 不持有股票状态，这里就有两种卖出股票状态
+    # 状态二：保持卖出股票的状态（两天前就卖出了股票，度过一天冷冻期。或者是前一天就是卖出股票状态，一直没操作）
+    # 状态三：今天卖出股票
+    # 状态四：今天为冷冻期状态，但冷冻期状态不可持续，只有一天！
+    dp = [[-prices[0], 0, 0, 0]]+[[0, 0, 0, 0] for _ in range(1, len(prices))]
+    for i in range(1, len(prices)):
+        # 买入状态，与前一天是买入状态、前一天是冷冻期状态、前一天是保持卖出的状态有关
+        dp[i][0] = max([dp[i-1][0], dp[i-1][3]-prices[i], dp[i-1][1]-prices[i]])
+        # 保持卖出状态，与前一天是保持卖出状态、前一天是冷冻期状态有关
+        dp[i][1] = max(dp[i-1][1], dp[i-1][3])
+        # 当天卖出状态，只与前一天是买入状态有关
+        dp[i][2] = dp[i-1][0] + prices[i]
+        # 当天为冷冻期状态，至于前一天是卖出状态有关
+        dp[i][3] = dp[i-1][2]
+    return max(dp[-1])
+
+
+# 每笔交易都要支付一笔手续费
+# 可以无限次买卖，从买入到卖出只需要支付一次手续费
+def maxProfit5(prices: [int], fee: int) -> int:
+    dp = [[-prices[0], 0]] + [[0, 0] for _ in range(1, len(prices))]
+    for i in range(1, len(prices)):
+        dp[i][0] = max(dp[i - 1][0], dp[i - 1][1] - prices[i])
+        dp[i][1] = max(dp[i - 1][1], dp[i - 1][0] + prices[i] - fee)
+    return max(dp[-1])
+
+
+'''
+子序列系列
+'''
+
+
+# 最长递增子序列
+def lengthOfLIS(nums: [int]) -> int:
+    dp = [1 for _ in range(len(nums))]  # 以dp[i]为结尾的最长递增子序列，并不一定是最终结果
+    result = 1
+    for i in range(1, len(nums)):
+        for j in range(0, i):
+            if nums[i] > nums[j]:
+                dp[i] = max(dp[i], dp[j] + 1)
+        result = max(dp[i], result)  # 求值最大的dp[i]
+    return result
+
+
+# 最长连续递增子序列
+def findLengthOfLCIS(self, nums: [int]) -> int:
+    dp = [1 for _ in range(len(nums))]
+    result = 1
+    for i in range(1, len(nums)):
+        if nums[i] > nums[i - 1]:
+            dp[i] = dp[i - 1] + 1
+        result = max(result, dp[i])
+    return result
+
+
+# 最长连续公共子序列，和最长公共子序列不同
+def findLength(nums1: [int], nums2: [int]) -> int:
+    # 以nums1[i-1]，nums2[j-1]结尾的最长连续子序列的长度
+    # dp[-1][-1]不一定是最大值
+    dp = [[0 for _ in range(len(nums1) + 1)] for _ in range(len(nums2) + 1)]
+    result = 0
+    for i in range(1, len(nums2) + 1):
+        for j in range(1, len(nums1) + 1):
+            if nums1[j - 1] == nums2[i - 1]:
+                dp[i][j] = dp[i - 1][j - 1] + 1
+            result = max(result, dp[i][j])
+    return result
+
+
+# 最长公共子序列，不要求连续,但要求有序
+def longestCommonSubsequence(text1: str, text2: str) -> int:
+    # 以text1[i-1]，text2[j-1]结尾的最长子序列的长度
+    # dp[-1][-1]一定为最大值,因为累加了之前的状态
+    dp = [[0 for _ in range(len(text1) + 1)] for _ in range(len(text2) + 1)]
+    for i in range(1, len(text2) + 1):
+        for j in range(1, len(text1) + 1):
+            if text1[j - 1] == text2[i - 1]:
+                dp[i][j] = dp[i - 1][j - 1] + 1
+            else:
+                dp[i][j] = max(dp[i][j - 1], dp[i - 1][j])
+    return dp[-1][-1]
+
+
+# 具有最大和的连续子序列
+def maxSubArray(nums: [int]) -> int:
+    dp = [nums[0]] + [0 for _ in range(1, len(nums))]
+    result = dp[0]
+    for i in range(1, len(nums)):
+        dp[i] = max(nums[i], dp[i - 1] + nums[i])
+        result = max(dp[i], result)
+    return result
+
+
+#
 
 
 def cache_func(func):
