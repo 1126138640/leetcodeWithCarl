@@ -258,7 +258,7 @@ def coinChange(coins: [int], amount: int) -> int:
 # 给定一个数n，最少需要几个完全平方数使其和为n【放满背包最少物品数量】
 def numSquares(n: int) -> int:
     nums = []
-    dp = [0] + [n for i in range(n)]  # 要初始化为一个大数
+    dp = [0] + [n for _ in range(n)]  # 要初始化为一个大数
     # 求完全平方数
     for i in range(floor(pow(n, 0.5)) + 1):
         nums.append(pow(i, 2))
@@ -573,7 +573,132 @@ def maxSubArray(nums: [int]) -> int:
     return result
 
 
-#
+# 判断s是否为t的子序列，不连续,但有序;即从t中删除几个元素可得到s【模拟删除问题】
+def isSubsequence_DP(s: str, t: str) -> bool:
+    # dp[i][j] 表示以下标i-1为结尾的字符串s，和以下标j-1为结尾的字符串t，相同子序列的长度为dp[i][j]
+    dp = [[0] * (len(t) + 1) for _ in range(len(s) + 1)]
+    for i in range(1, len(s) + 1):
+        for j in range(1, len(t) + 1):
+            if s[i - 1] == t[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1] + 1
+            else:
+                # 即i继续往前走，j停一步
+                dp[i][j] = dp[i][j-1]  # 模拟删除，不考虑t[j-1]，t是母串
+    if dp[-1][-1] == len(s):
+        return True
+    return False
+
+
+# 计算s中有多少回文子串
+def countSubstrings(s: str) -> int:
+    # 以s[i]为头s[j]为尾的字符串是否为回文串
+    dp = [[False for _ in range(len(s))] for _ in range(len(s))]
+    result = 0
+    # 从左下角向右上角遍历
+    for i in range(len(s) - 1, -1, -1):
+        for j in range(i, len(s)):
+            if s[i] == s[j] and (j - i <= 1 or dp[i + 1][j - 1]):
+                dp[i][j] = True
+                result += 1
+    return result
+
+
+# 判断是否为回文串，双指针法
+def countSubstrings_DoublePointer(self, s: str) -> int:
+    result = 0
+    for i in range(len(s)):
+        result += self.extend(s, i, i, len(s))  # 以i为中心  一个点为中心
+        result += self.extend(s, i, i + 1, len(s))  # 以i和i+1为中心，两个点为中心
+    return result
+
+
+# 最长回文子序列的长度
+def longestPalindromeSubseq(s: str) -> int:
+    # 以s[i]为头s[j]为尾的最长回文子串的长度
+    dp = [[1 if i == j else 0 for i in range(len(s))] for j in range(len(s))]
+    for i in range(len(s) - 1, -1, -1):
+        for j in range(i, len(s)):
+            if s[i] == s[j]:
+                if j - i <= 1:
+                    dp[i][j] = j - i + 1
+                else:
+                    # 前后各+1
+                    dp[i][j] = dp[i + 1][j - 1] + 2
+            else:
+                dp[i][j] = max(dp[i + 1][j], dp[i][j - 1])
+    return dp[0][-1]
+
+
+def extend(self, s, i, j, n):
+    res = 0
+    while i >= 0 and j < n and s[i] == s[j]:
+        i -= 1
+        j += 1
+        res += 1
+    return res
+
+
+# 求最长回文子串的长度
+
+
+
+def isSubsequence_doublePointer(s: str, t: str) -> bool:
+    # 双指针解法
+    slow = fast = 0
+    while slow < len(s) and fast < len(t):
+        if s[slow] == t[fast]:
+            slow += 1
+            fast += 1
+        else:
+            fast += 1
+    return slow == len(s)
+
+
+# 给你两个字符串 s 和 t ，统计并返回在 s 的 子序列 中 t 出现的个数
+# 即，长序列s删除其中的元素，有几种删除方式能得到t【模拟删除问题】
+def numDistinct(s: str, t: str) -> int:
+    # 当 j = 0 时,表示t为空串，即s有几种删除方式能得到空串，即dp[0][i] = 1
+    # dp[i][j]：以i-1为结尾的s子序列中出现以j-1为结尾的t的个数为dp[i][j]
+    dp = [[1 for _ in range(len(s) + 1)]] + [[0 for _ in range(len(s) + 1)] for _ in range(1, len(t) + 1)]
+    for i in range(1, len(t) + 1):
+        for j in range(1, len(s) + 1):
+            if t[i - 1] == s[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1] + dp[i-1][j]  # 考虑s[i-1]和都不考虑两种情况的总和
+            else:
+                dp[i][j] = dp[i-1][j]  # 两者不相同考虑s[i-1]的情况，因为s为母串
+    return dp[-1][-1]
+
+
+# 求由word1变为word2要执行几步删除操作【模拟删除问题】
+def minDistance(word1: str, word2: str) -> int:
+    # 当i为0是表示空串，dp[0][j]要执行j步删除才能为空，即dp[0][j] = j；同理，dp[i][0] = i
+    # dp[i][j]：以i-1为结尾的字符串word1，和以j-1位结尾的字符串word2，想要达到相等，所需要删除元素的最少次数
+    dp = [[i for i in range(len(word1) + 1)]] + [[j for _ in range(len(word1) + 1)] for j in range(1, len(word2) + 1)]
+    for i in range(1, len(word2) + 1):
+        for j in range(1, len(word1) + 1):
+            if word2[i - 1] == word1[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1]  # 不执行删除
+            else:
+                # 当同时删word1[i - 1]和word2[j - 1]，dp[i][j-1] 本来就不考虑 word2[j - 1]了，
+                # 那么我在删 word1[i - 1]，是不是就达到两个元素都删除的效果，即 dp[i][j-1] + 1。
+                # 考虑一方+1，两方都考虑+2，取最小
+                dp[i][j] = min([dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + 2])  # 删除1个或两个都删取最小
+    return dp[-1][-1]
+
+
+# 编辑距离，将word1通过几次增删改可以变为word2
+def minDistance_th(word1: str, word2: str) -> int:
+    # 当i为0是表示空串，dp[0][j]要执行j步删除才能为空，即dp[0][j] = j；同理，dp[i][0] = i
+    # dp[i][j]：以i-1为结尾的字符串word1，和以j-1位结尾的字符串word2，想要达到相等，所需要删除元素的最少次数
+    dp = [[i for i in range(len(word1) + 1)]] + [[j for _ in range(len(word1) + 1)] for j in range(1, len(word2) + 1)]
+    for i in range(1, len(word2) + 1):
+        for j in range(1, len(word1) + 1):
+            if word2[i - 1] == word1[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1]
+            else:
+                # 增删改均只需要一次操作
+                dp[i][j] = min([dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]]) + 1
+    return dp[-1][-1]
 
 
 def cache_func(func):
