@@ -629,6 +629,23 @@ def longestPalindromeSubseq(s: str) -> int:
     return dp[0][-1]
 
 
+# 摆动序列【动态规划】
+def wiggleMaxLength_dp(nums):
+    # 设 dp 状态dp[i][0]，表示考虑前 i 个数，第 i 个数作为山峰的摆动子序列的最长长度
+    # 设 dp 状态dp[i][1]，表示考虑前 i 个数，第 i 个数作为山谷的摆动子序列的最长长度
+    dp = [[0, 0] for _ in range(len(nums))]  # 创建二维dp数组，用于记录摆动序列的最大长度
+    dp[0][0] = dp[0][1] = 1  # 初始条件，序列中的第一个元素默认为峰值，最小长度为1
+    for i in range(1, len(nums)):
+        dp[i][0] = dp[i][1] = 1  # 初始化当前位置的dp值为1
+        for j in range(i):
+            if nums[j] > nums[i]:
+                dp[i][1] = max(dp[i][1], dp[j][0] + 1)  # 如果前一个数比当前数大，可以形成一个上升峰值，更新dp[i][1]
+        for j in range(i):
+            if nums[j] < nums[i]:
+                dp[i][0] = max(dp[i][0], dp[j][1] + 1)  # 如果前一个数比当前数小，可以形成一个下降峰值，更新dp[i][0]
+    return max(dp[-1][0], dp[-1][1])  # 返回最大的摆动序列长度
+
+
 def extend(self, s, i, j, n):
     res = 0
     while i >= 0 and j < n and s[i] == s[j]:

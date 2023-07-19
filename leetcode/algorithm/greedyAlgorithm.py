@@ -10,6 +10,7 @@ def ace_max_number(a: int):
             index = i-1
             c[i-1] -= 1
     res = 0
+    # 复原
     for i in range(len(b)):
         if i < index:
             res += int(b[i])*pow(10, len(b)-i-1)
@@ -23,4 +24,111 @@ def ace_max_number(a: int):
     return res
 
 
-print(ace_max_number(10))
+# 分饼干【遍历胃口，大饼干优先】【遍历饼干，小饼干优先】
+# 遍历胃口，大饼干优先
+def findContentChildren_children(self, g, s):
+    g.sort()  # 将孩子的贪心因子排序
+    s.sort()  # 将饼干的尺寸排序
+    index = len(s) - 1  # 饼干数组的下标，从最后一个饼干开始
+    result = 0  # 满足孩子的数量
+    for i in range(len(g) - 1, -1, -1):  # 遍历胃口，从最后一个孩子开始
+        if index >= 0 and s[index] >= g[i]:  # 遍历饼干
+            result += 1
+            index -= 1
+    return result
+
+# 遍历饼干，小饼干优先
+def findContentChildren_cookie(self, g, s):
+    g.sort()  # 将孩子的贪心因子排序
+    s.sort()  # 将饼干的尺寸排序
+    index = 0
+    for i in range(len(s)):  # 遍历饼干
+        if index < len(g) and g[index] <= s[i]:  # 如果当前孩子的贪心因子小于等于当前饼干尺寸
+            index += 1  # 满足一个孩子，指向下一个孩子
+    return index  # 返回满足的孩子数目
+
+
+# 摆动序列【贪心解法，要考虑首尾元素、单调平坡、非单调平坡等状态】
+def wiggleMaxLength(nums):
+    if len(nums) <= 1:
+        return len(nums)  # 如果数组长度为0或1，则返回数组长度
+    curDiff = 0  # 当前一对元素的差值
+    preDiff = 0  # 前一对元素的差值
+    result = 1  # 记录峰值的个数，初始为1（默认最右边的元素被视为峰值）
+    for i in range(len(nums) - 1):
+        curDiff = nums[i + 1] - nums[i]  # 计算下一个元素与当前元素的差值
+        # 如果遇到一个峰值
+        if (preDiff <= 0 and curDiff > 0) or (preDiff >= 0 and curDiff < 0):
+            result += 1  # 峰值个数加1
+            preDiff = curDiff  # 注意这里，只在摆动变化的时候更新preDiff
+    return result  # 返回最长摆动子序列的长度
+
+
+# 摆动序列【动态规划】
+def wiggleMaxLength_dp(nums):
+    # 设 dp 状态dp[i][0]，表示考虑前 i 个数，第 i 个数作为山峰的摆动子序列的最长长度
+    # 设 dp 状态dp[i][1]，表示考虑前 i 个数，第 i 个数作为山谷的摆动子序列的最长长度
+    dp = [[0, 0] for _ in range(len(nums))]  # 创建二维dp数组，用于记录摆动序列的最大长度
+    dp[0][0] = dp[0][1] = 1  # 初始条件，序列中的第一个元素默认为峰值，最小长度为1
+    for i in range(1, len(nums)):
+        dp[i][0] = dp[i][1] = 1  # 初始化当前位置的dp值为1
+        for j in range(i):
+            if nums[j] > nums[i]:
+                dp[i][1] = max(dp[i][1], dp[j][0] + 1)  # 如果前一个数比当前数大，可以形成一个上升峰值，更新dp[i][1]
+        for j in range(i):
+            if nums[j] < nums[i]:
+                dp[i][0] = max(dp[i][0], dp[j][1] + 1)  # 如果前一个数比当前数小，可以形成一个下降峰值，更新dp[i][0]
+    return max(dp[-1][0], dp[-1][1])  # 返回最大的摆动序列长度
+
+
+# 最大连续子序列和
+def maxSubArray(nums: [int]) -> int:
+    count = 0
+    result = -pow(10, 4)
+    for i in range(len(nums)):
+        count += nums[i]
+        if count > result:
+            result = count
+        if count < 0:
+            count = 0
+    return result
+
+
+# 买卖股票的最佳时机【不能同时持有多只股票】
+def maxProfit(prices: [int]) -> int:
+    result = 0
+    for i in range(1, len(prices)):
+        result += max(0, prices[i] - prices[i - 1])
+    return result
+
+
+# 等同于下面的思想
+def maxProfit_m(prices: [int]) -> int:
+    dp = [0 for _ in range(len(prices))]
+    for i in range(1, len(prices)):
+        dp[i] = max(dp[i-1], dp[i-1] + prices[i] - prices[i-1])
+    return dp[-1]
+
+
+# 跳跃
+def canJump_while(nums: [int]) -> bool:
+    if len(nums) == 1: return True
+    cover = nums[0]
+    index = 0
+    while index <= cover:
+        cover = max(cover, index + nums[index])
+        if cover >= len(nums) - 1:
+            return True
+        index += 1
+    return False
+
+
+def canJump_for(nums: [int]) -> bool:
+    if len(nums) == 1: return True
+    cover = nums[0]
+    for i in range(len(nums)):
+        if i <= cover:
+            cover = max(cover, nums[i]+i)
+            if cover >= len(nums)-1:
+                return True
+    return False
