@@ -81,7 +81,7 @@ def wiggleMaxLength_dp(nums):
     return max(dp[-1][0], dp[-1][1])  # 返回最大的摆动序列长度
 
 
-# 最大连续子序列和
+# 最大连续子序列和，具有最大和的连续子数组（子数组最少包含一个元素）
 def maxSubArray(nums: [int]) -> int:
     count = 0
     result = -pow(10, 4)
@@ -89,6 +89,7 @@ def maxSubArray(nums: [int]) -> int:
         count += nums[i]
         if count > result:
             result = count
+        # 复原
         if count < 0:
             count = 0
     return result
@@ -110,7 +111,7 @@ def maxProfit_m(prices: [int]) -> int:
     return dp[-1]
 
 
-# 跳跃
+# 跳跃，从第i个位置跳，最远可以跳到nums[i]+i的位置
 def canJump_while(nums: [int]) -> bool:
     if len(nums) == 1: return True
     cover = nums[0]
@@ -132,3 +133,43 @@ def canJump_for(nums: [int]) -> bool:
             if cover >= len(nums)-1:
                 return True
     return False
+
+
+# 跳跃2 跳跃步数最少
+def jump(self, nums: [int]) -> int:
+    # 起点位置就是终点位置
+    if len(nums) == 1: return 0
+    cover = steps = index = 0
+    for i in range(len(nums)):
+        cover = max(nums[i]+i, cover)
+        if i == index:
+            steps += 1
+            index = cover
+            if cover >= len(nums)-1:
+                break
+    return steps
+
+
+# 代码简洁版
+def jump_sim(nums: [int]) -> int:
+    if len(nums) == 1: return 0
+    cover = index = steps = 0
+    for i in range(len(nums)-1):
+        cover = max(nums[i]+i, cover)
+        if i == index:
+            steps += 1
+            index = cover
+    return steps
+
+
+# 给定数组nums和k，将数组中的数字取反k次，使数组和最大
+def largestSumAfterKNegations(A: [int], K: int) -> int:
+    A.sort(key=lambda x: abs(x), reverse=True)  # 第一步：按照绝对值降序排序数组A
+    for i in range(len(A)):  # 第二步：执行K次取反操作【将负数取反】
+        if A[i] < 0 < K:  # A[i] < 0 and k > 0
+            A[i] *= -1
+            K -= 1
+    if K % 2 == 1:  # 第三步：如果K还有剩余次数，将绝对值最小的元素取反【此时数组中全是正数,只需要再执行一次】
+        A[-1] *= -1
+    result = sum(A)  # 第四步：计算数组A的元素和
+    return result
