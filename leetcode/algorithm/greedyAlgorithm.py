@@ -173,3 +173,72 @@ def largestSumAfterKNegations(A: [int], K: int) -> int:
         A[-1] *= -1
     result = sum(A)  # 第四步：计算数组A的元素和
     return result
+
+
+# 加油站，从第 i 个加油站开往第 i+1 个加油站需要消耗汽油 cost[i] 升。初始值为0，顺序绕路环行，每个站点加油gas[i]
+def canCompleteCircuit(gas: [int], cost: [int]) -> int:
+    start = 0
+    currentSum = 0
+    totalSum = 0
+    for i in range(len(gas)):
+        currentSum += gas[i] - cost[i]
+        totalSum += gas[i] - cost[i]
+        if currentSum < 0:
+            currentSum = 0
+            start = i + 1  # 当前面总剩余油量为负，起始点定为i+1
+    if totalSum < 0: return -1  # 若总的油量小于消耗油量，则不可能环行一周
+    return start
+
+
+# 分发糖果，给定ratings数组，求最少需要的糖果
+# 每个孩子至少分配到 1 个糖果。
+# 相邻两个孩子评分更高的孩子会获得更多的糖果。
+def candy(ratings: [int]) -> int:
+    candyArr = [1 for _ in range(len(ratings))]
+    for i in range(len(ratings) - 2, -1, -1):
+        if ratings[i] > ratings[i + 1]:
+            candyArr[i] = candyArr[i + 1] + 1
+    for i in range(1, len(ratings)):
+        if ratings[i] > ratings[i - 1]:
+            # 求max为了避免类似的情况
+            # [1,6,10,8,7,3,2]
+            # 第一轮变为 [1,1,5,4,3,2,1]
+            # 若不是求max只是+1的话会变成[1,2,3,4,3,2,1]
+            candyArr[i] = max(candyArr[i - 1] + 1, candyArr[i])
+    return sum(candyArr)
+
+
+# 找零，按序找零
+def lemonadeChange(self, bills: [int]) -> bool:
+    if bills[0] > 5: return False
+    five = ten = twenty = 0
+    for i in range(len(bills)):
+        if bills[i] == 5:
+            five += 1
+        if five < 1: return False
+        if bills[i] == 10:
+            ten += 1
+            five -= 1
+        if bills[i] == 20:
+            twenty += 1
+            if ten > 0:
+                ten -= 1
+                five -= 1
+            elif five > 2:
+                five -= 3
+            else:
+                return False
+    return True
+
+
+# 身高排序，people[i] = [hi, ki] 表示第 i 个人的身高为 hi ，前面 正好 有 ki 个身高大于或等于 hi 的人。
+def reconstructQueue(self, people: [[int]]) -> [[int]]:
+    # 先按照h维度的身高顺序从高到低排序。确定第一个维度
+    # lambda返回的是一个元组：当-x[0](维度h）相同时，再根据x[1]（维度k）从小到大排序，-x[0]是因为要从大到小排序，h逆序，k正序
+    people.sort(key=lambda x: (-x[0], x[1]))
+    que = []
+    # 根据每个元素的第二个维度k，贪心算法，进行插入
+    # people已经排序过了：同一高度时k值小的排前面。
+    for p in people:
+        que.insert(p[1], p)
+    return que
