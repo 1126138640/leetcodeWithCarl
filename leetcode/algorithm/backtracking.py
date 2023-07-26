@@ -128,7 +128,7 @@ def backTracking_withUsed(candidates: [int], target: int, startIndex: int, path:
     for i in range(startIndex, len(candidates)):
         # 剪枝
         if currentSum + candidates[i] > target: break
-        # 剪枝，当i > startIndex，执行的是树层逻辑，i == startIndex是树枝的逻辑
+        # 剪枝，当i > startIndex，执行的是树层逻辑【横着】，i == startIndex是树枝的逻辑【竖着】
         if i > startIndex and not used[i - 1] and candidates[i] == candidates[i - 1]: continue
         currentSum += candidates[i]
         path.append(candidates[i])
@@ -137,3 +137,71 @@ def backTracking_withUsed(candidates: [int], target: int, startIndex: int, path:
         currentSum -= candidates[i]
         used[i] = False
         path.pop()
+
+
+# 切割回文串，给你一个字符串 s，请你将 s 分割成一些子串，使每个子串都是回文串。
+def partition(s: str) -> List[List[str]]:
+    res = []
+    backTracking_Palindrome(s, 0, [], res)
+    return res
+
+
+def backTracking_Palindrome(s: str, startIndex: int, path: [str], res: [[str]]):
+    if startIndex == len(s):
+        res.append(path[:])
+        return
+    # 这是树层的逻辑
+    for i in range(startIndex, len(s)):
+        if is_Palindrome(s[startIndex:i + 1]):
+            path.append(s[startIndex:i + 1])
+        else:
+            continue
+        backTracking_Palindrome(s, i + 1, path, res)
+        path.pop()
+
+
+def is_Palindrome(s: str) -> bool:
+    if len(s) == 1: return True
+    for i in range(len(s) // 2 + 1):
+        if s[i] != s[len(s) - i - 1]:
+            return False
+        return True
+
+
+# 给定一个只包含数字的字符串，复原它并返回所有可能的 IP 地址格式
+def restoreIpAddresses(s: str) -> List[str]:
+    res = []
+    backTracking_restoreIpAddresses(s, 0, [], res)
+    return res
+
+
+def backTracking_restoreIpAddresses(s: str, startIndex: int, path: [], res: [str]):
+    if startIndex == len(s) and len(path) == 4:
+        res.append('.'.join(path))
+    for i in range(startIndex, len(s)):
+        if len(path) < 4 and (len(s) - startIndex - 1) // (4 - len(path)) > 3: break
+        if i > startIndex and s[startIndex] != '0' and int(s[startIndex:i + 1]) <= 255:
+            path.append(s[startIndex:i + 1])
+        elif i == startIndex:
+            path.append(s[startIndex])
+        else:
+            continue
+        backTracking_restoreIpAddresses(s, i + 1, path, res)
+        path.pop()
+
+
+# 求子集,给你一个整数数组 nums ，数组中的元素 互不相同 。返回该数组所有可能的子集（幂集）【包括空集】
+# 结果在每个子节点中，不止是叶子节点
+def subsets(nums: List[int]) -> List[List[int]]:
+    res = []
+    backTracking_subsets(nums, 0, [], res)
+    return res
+
+
+def backTracking_subsets(nums: [int], startIndex: int, path: [int], res: [[int]]):
+    res.append(path[:])
+    for i in range(startIndex, len(nums)):
+        path.append(nums[i])
+        backTracking_subsets(nums, i + 1, path, res)
+        path.pop()
+
