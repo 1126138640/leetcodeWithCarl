@@ -1,4 +1,7 @@
 # 小于n且数字单调递增的最大值
+from typing import List
+
+
 def ace_max_number(a: int):
     b = str(a)
     c = []
@@ -242,3 +245,159 @@ def reconstructQueue(self, people: [[int]]) -> [[int]]:
     for p in people:
         que.insert(p[1], p)
     return que
+
+
+from collections import defaultdict
+
+
+# 重新安排行程，欧拉路径
+def findItinerary(tickets: List[List[str]]) -> List[str]:
+    path = defaultdict(list)
+    for i in tickets:
+        path[i[0]].append(i[1])
+    for j in path.keys():
+        path[j].sort(reverse=True)
+    res = []
+
+    def dfs(node):
+        while path[node]:
+            # 每次pop掉最小的，即下次出发的起点，如果没有对应的路径，则认为到达终点
+            # 即跳出while，开始回溯，在回溯过程中发现新的路径
+            dfs(path[node].pop())
+        res.append(node)
+
+    dfs('JFK')
+    return res[::-1]
+
+
+# n皇后
+def solveNQueens_carl(n: int) -> List[List[str]]:
+    result = []  # 存储最终结果的二维字符串数组
+    chessboard = ['.' * n for _ in range(n)]  # 初始化棋盘
+    backtracking_solveNQueens_carl(n, 0, chessboard, result)  # 回溯求解
+    return [[''.join(row) for row in solution] for solution in result]  # 返回结果集
+
+
+def backtracking_solveNQueens_carl(n: int, row: int, chessboard: List[str], result: List[List[str]]) -> None:
+    if row == n:
+        result.append(chessboard[:])  # 棋盘填满，将当前解加入结果集
+        return
+
+    for col in range(n):
+        if isValid(row, col, chessboard):  # 合理才递归
+            chessboard[row] = chessboard[row][:col] + 'Q' + chessboard[row][col + 1:]  # 放置皇后
+            backtracking_solveNQueens_carl(n, row + 1, chessboard, result)  # 递归到下一行
+            chessboard[row] = chessboard[row][:col] + '.' + chessboard[row][col + 1:]  # 回溯，撤销当前位置的皇后
+
+
+def isValid(row: int, col: int, chessboard: List[str]) -> bool:
+    # 检查列
+    for i in range(row):
+        if chessboard[i][col] == 'Q':
+            return False  # 当前列已经存在皇后，不合法
+
+    # 检查 45 度角是否有皇后
+    i, j = row - 1, col - 1
+    while i >= 0 and j >= 0:
+        if chessboard[i][j] == 'Q':
+            return False  # 左上方向已经存在皇后，不合法
+        i -= 1
+        j -= 1
+
+
+# n皇后，记录已选状态，便于判断
+def solveNQueens(n: int) -> List[List[str]]:
+    res = []
+    path = [['.' for _ in range(n)] for _ in range(n)]
+    backTracking_solveNQueens(n, path, res, 0, [])
+    return res
+
+
+def backTracking_solveNQueens(n: int, path: [], res: [[str]], row: int, record: []):
+    if row == n:
+        res.append([''.join(i) for i in path])
+        return
+    for i in range(n):
+        if is_valid(i, row, n, record):
+            path[row][i] = 'Q'
+            record.append(i)
+            backTracking_solveNQueens(n, path, res, row + 1, record)
+            record.pop()
+            path[row][i] = '.'
+
+
+def is_valid(self, column: int, row: int, n, record: [int]):
+    for i in range(row):
+        if column in record or column == record[i] + row - i or column == record[i] - row + i:
+            return False
+    return True
+
+
+# n皇后，总共有几种方案
+result = 0
+
+
+def totalNQueens(n: int) -> int:
+    backTracking_totalNQueens(n, [], 0)
+    return result
+
+
+def backTracking_totalNQueens(n: int, record: [int], row: int):
+    if row == n:
+        global result
+        result += 1
+        return
+    for i in range(n):
+        if is_valid_totalNQueens(i, row, record):
+            record.append(i)
+            backTracking_totalNQueens(n, record, row + 1)
+            record.pop()
+
+
+def is_valid_totalNQueens(column: int, row: int, record: []):
+    for i in range(row):
+        if column in record or column == record[i] - row + i or column == record[i] + row - i: return False
+    return True
+
+
+# 解数独, 二维递归
+def solveSudoku(board: List[List[str]]) -> None:
+    """
+    Do not return anything, modify board in-place instead.
+    """
+    backTracking_solveSudoku(board)
+
+
+def backTracking_solveSudoku(board: [[str]]) -> bool:
+    # 若有解，返回True；若无解，返回False
+    for i in range(len(board)):  # 遍历行
+        for j in range(len(board[0])):  # 遍历列
+            # 若空格内已有数字，跳过
+            if board[i][j] != '.': continue
+            for k in range(1, 10):
+                if is_valid_solveSudoku(i, j, k, board):
+                    board[i][j] = str(k)
+                    if backTracking_solveSudoku(board): return True
+                    board[i][j] = '.'
+            # 若数字1-9都不能成功填入空格，返回False无解
+            return False
+    return True  # 有解
+
+
+def is_valid_solveSudoku(row: int, col: int, val: int, board: List[List[str]]) -> bool:
+    # 判断同一行是否冲突
+    for i in range(9):
+        if board[row][i] == str(val):
+            return False
+    # 判断同一列是否冲突
+    for j in range(9):
+        if board[j][col] == str(val):
+            return False
+    # 判断同一九宫格是否有冲突
+    start_row = (row // 3) * 3
+    start_col = (col // 3) * 3
+    for i in range(start_row, start_row + 3):
+        for j in range(start_col, start_col + 3):
+            if board[i][j] == str(val):
+                return False
+    return True

@@ -1,5 +1,6 @@
 from typing import List
 
+
 # 递归语句执行树枝逻辑
 # for循环 i > startIndex执行树层逻辑
 
@@ -42,12 +43,12 @@ def backTracking_combinationSum3(k: int, n: int, startIndex: int, path: [int], r
 
 # 电话按键，给定一个仅包含数字 2-9 的字符串，返回所有它能表示的字母组合，每一个数字表示一串字符
 def letterCombinations(digits: str) -> List[str]:
-        if len(digits) < 1: return []
-        # 从0-9表示的字符串
-        letter = ["", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"]
-        res = []
-        backTracking_letterCombinations(digits, 0, "", res, letter)
-        return res
+    if len(digits) < 1: return []
+    # 从0-9表示的字符串
+    letter = ["", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"]
+    res = []
+    backTracking_letterCombinations(digits, 0, "", res, letter)
+    return res
 
 
 def backTracking_letterCombinations(digits: str, index_nums: int, path: str, res: [str], letter: [str]):
@@ -57,7 +58,7 @@ def backTracking_letterCombinations(digits: str, index_nums: int, path: str, res
     chars = letter[int(digits[index_nums])]
     for j in range(len(chars)):  # 同一层搜索
         path += chars[j]
-        backTracking_letterCombinations(digits, index_nums+1, path, res, letter)  # 深度优先，每次往下一层
+        backTracking_letterCombinations(digits, index_nums + 1, path, res, letter)  # 深度优先，每次往下一层
         path = path[:-1]  # 回溯
 
 
@@ -69,7 +70,8 @@ def combinationSum(candidates: List[int], target: int) -> List[List[int]]:
     return res
 
 
-def backTracking_combinationSum(candidates: [int], target: int, path: [int], res: [[int]], currentSum: int, startIndex: int):
+def backTracking_combinationSum(candidates: [int], target: int, path: [int], res: [[int]], currentSum: int,
+                                startIndex: int):
     if currentSum > target: return  # 提前剪枝
     if currentSum == target:
         res.append(path[:])
@@ -87,13 +89,14 @@ def backTracking_combinationSum(candidates: [int], target: int, path: [int], res
 
 # 组合总和，每个数字在每个组合中只能使用 一次，candidates中会有重复数字，但是每个数字只能使用一次
 def combinationSum2_withoutUsed(candidates: List[int], target: int) -> List[List[int]]:
-        candidates.sort()
-        res = []
-        backTracking_combinationSum2_withoutUsed(candidates, target, 0, [],res, 0)
-        return res
+    candidates.sort()
+    res = []
+    backTracking_combinationSum2_withoutUsed(candidates, target, 0, [], res, 0)
+    return res
 
 
-def backTracking_combinationSum2_withoutUsed(candidates: [int], target: int, startIndex: int, path: [int], res: [int], currentSum: int):
+def backTracking_combinationSum2_withoutUsed(candidates: [int], target: int, startIndex: int, path: [int], res: [int],
+                                             currentSum: int):
     if currentSum > target: return
     if currentSum == target and path not in res:
         res.append(path[:])
@@ -101,11 +104,11 @@ def backTracking_combinationSum2_withoutUsed(candidates: [int], target: int, sta
     for i in range(startIndex, len(candidates)):
         if currentSum + candidates[i] > target: break
         # 当i > startIndex，执行的是树层逻辑，i == startIndex是树枝的逻辑
-        if i > startIndex and candidates[i] == candidates[i-1]: continue  # 树层剪枝
+        if i > startIndex and candidates[i] == candidates[i - 1]: continue  # 树层剪枝
         currentSum += candidates[i]
         path.append(candidates[i])
         # 不可重复选取，i+1，此时这里面执行的树枝逻辑i = startIndex
-        backTracking_combinationSum2_withoutUsed(candidates, target, i+1, path, res, currentSum)
+        backTracking_combinationSum2_withoutUsed(candidates, target, i + 1, path, res, currentSum)
         currentSum -= candidates[i]
         path.pop()
 
@@ -119,7 +122,8 @@ def combinationSum2_withUsed(candidates: List[int], target: int) -> List[List[in
     return res
 
 
-def backTracking_withUsed(candidates: [int], target: int, startIndex: int, path: [int], res: [int], currentSum: int, used: [bool]):
+def backTracking_withUsed(candidates: [int], target: int, startIndex: int, path: [int], res: [int], currentSum: int,
+                          used: [bool]):
     # 剪枝
     if currentSum > target: return
     if currentSum == target and path not in res:
@@ -205,3 +209,108 @@ def backTracking_subsets(nums: [int], startIndex: int, path: [int], res: [[int]]
         backTracking_subsets(nums, i + 1, path, res)
         path.pop()
 
+
+# 求子集,给你一个整数数组 nums ，其中可能包含重复元素，请你返回该数组所有可能的子集(幂集)
+def subsetsWithDup(nums: List[int]) -> List[List[int]]:
+    res = []
+    nums.sort()  # 排序以去重，不然就得每次循环都要判断是否已存在
+    backTracking_subsetsWithDup(nums, 0, [], res)
+    return res
+
+
+def backTracking_subsetsWithDup(nums: [int], startIndex: int, path: [int], res: [[int]]):
+    res.append(path[:])
+    for i in range(startIndex, len(nums)):
+        if i > startIndex and nums[i] == nums[i - 1]: continue
+        path.append(nums[i])
+        backTracking_subsetsWithDup(nums, i + 1, path, res)
+        path.pop()
+
+
+# 求递增子序列
+def findSubsequences(nums: List[int]) -> List[List[int]]:
+    res = []
+    backTracking_findSubsequences(nums, 0, [], res)
+    return res
+
+
+def backTracking_findSubsequences(nums: [int], startIndex: int, path: [int], res: [[int]]):
+    if len(path) > 1:
+        res.append(path[:])
+    uset = set()  # 只在同一树层中有效，因为本题不能排序，只能通过在数层中设置集合来去重
+    for i in range(startIndex, len(nums)):
+        # 去重，1是非递增去掉，2是去掉同一树层重复元素
+        if (path and nums[i] < path[-1]) or nums[i] in uset: continue
+        path.append(nums[i])
+        uset.add(nums[i])  # 只记录同一层的元素
+        backTracking_findSubsequences(nums, i + 1, path, res)
+        path.pop()
+
+
+# 全排列,给定一个不含重复数字的数组 nums ，返回其 所有可能的全排列 。
+def permute(nums: List[int]) -> List[List[int]]:
+    res = []
+    # 记录元素是否被使用
+    used = [False for _ in range(len(nums))]
+    backTracking_permute(nums, used, [], res)
+    return res
+
+
+def backTracking_permute(nums: [int], used: [bool], path: [int], res: [[int]]):
+    if len(path) == len(nums):
+        res.append(path[:])
+        return
+    for i in range(len(nums)):
+        if used[i]: continue
+        path.append(nums[i])
+        used[i] = True
+        backTracking_permute(nums, used, path, res)
+        used[i] = False
+        path.pop()
+
+
+# 全排列，含重复元素
+# 在每个树层中设置一个集合用于记录已遍历的元素，比较是否有重复
+def permuteUnique_withoutSort(nums: List[int]) -> List[List[int]]:
+    res = []
+    used = [False for _ in range(len(nums))]
+    backTracking_permuteUnique_withoutSort(nums, used, [], res)
+    return res
+
+
+def backTracking_permuteUnique_withoutSort(nums: [int], used: [bool], path: [int], res: [[int]]):
+    if len(path) == len(nums):
+        res.append(path[:])
+    uset = set()
+    for i in range(len(nums)):
+        if used[i] or nums[i] in uset: continue
+        path.append(nums[i])
+        used[i] = True
+        uset.add(nums[i])
+        backTracking_permuteUnique_withoutSort(nums, used, path, res)
+        used[i] = False
+        path.pop()
+
+
+# 去重，先排序，再比较相邻元素【效率更高】
+def permuteUnique_withSort(nums: List[int]) -> List[List[int]]:
+    res = []
+    nums.sort()
+    used = [False for _ in range(len(nums))]
+    backTracking_permuteUnique_withSort(nums, used, [], res)
+    return res
+
+
+def backTracking_permuteUnique_withSort(nums: [int], used: [bool], path: [int], res: [[int]]):
+    if len(path) == len(nums):
+        res.append(path[:])
+    for i in range(len(nums)):
+        # used[i-1]=True是树枝上的去重【第一个值取了后变为True往下走，遇到第二个值此时还是True】
+        # used[i-1]=False才是树层上的去重【第一值走完树枝后又从True置为False了】
+        # 树层去重效率更高
+        if used[i] or (i > 0 and nums[i] == nums[i-1] and not used[i-1]): continue
+        path.append(nums[i])
+        used[i] = True
+        backTracking_permuteUnique_withSort(nums, used, path, res)
+        used[i] = False
+        path.pop()
