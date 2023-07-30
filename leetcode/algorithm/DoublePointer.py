@@ -61,7 +61,3 @@ def getIntersectionNode(self, headA: ListNode, headB: ListNode) -> ListNode:
     return tmp1
 
 
-
-
-
-print(sortedSquares([-7, -3, 2, 3, 11]))
