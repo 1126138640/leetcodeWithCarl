@@ -3,7 +3,7 @@ from typing import List
 
 # 单调栈，求左边第一个小于本元素的值或右边第一个大于本元素的值
 def dailyTemperatures(temperatures: List[int]) -> List[int]:
-    deque = collections.deque()
+    deque = []
     r = [0 for _ in range(len(temperatures))]
     for i in range(len(temperatures)):
         while len(deque) != 0 and temperatures[i] > temperatures[deque[-1]]:
@@ -49,5 +49,19 @@ def trap(height: List[int]) -> int:
             if deque:
                 # 因为递增栈，deque[-2]一定>=deque[-1]
                 res += (min(height[deque[-1]], height[i]) - height[tmp]) * (i - deque[-1] - 1)
+        deque.append(i)
+    return res
+
+
+# 柱状图中的最大矩形
+def largestRectangleArea(heights: List[int]) -> int:
+    deque, res = [], 0
+    heights.insert(0, 0)
+    heights.append(0)
+    for i in range(len(heights)):
+        while deque and heights[i] < heights[deque[-1]]:
+            tmp = deque.pop()
+            if deque:
+                res = max(res, heights[tmp] * (i - deque[-1] - 1))
         deque.append(i)
     return res
