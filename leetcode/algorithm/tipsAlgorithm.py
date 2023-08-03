@@ -87,3 +87,86 @@ def pivotIndex(nums: List[int]) -> int:
         left_sum += nums[i]
     return -1
 
+
+# 双指针法，二分搜索
+def binaryInsert(nums: List[int], target: int) -> int:
+    left, right = 0, len(nums) - 1
+    while left <= right:
+        mid = left + (right - left) // 2
+        if nums[mid] < target:
+            left = mid + 1
+        elif nums[mid] > target:
+            right = mid - 1
+        else:
+            return mid
+    return -1
+
+
+# 双指针发，搜索插入位置
+def searchInsert(nums: List[int], target: int) -> int:
+    # 初始化的时候就决定了，区间是左闭右毕，还是左闭右开
+    # 不同的区间，初始化、while终止条件、left/right重新赋值都不同
+    left, right = 0, len(nums) - 1
+    while left <= right:
+        mid = left + (right - left) // 2
+        if nums[mid] < target:
+            left = mid + 1
+        elif nums[mid] > target:
+            right = mid - 1
+        else:
+            return mid
+    return left
+
+
+# 寻找元素的起始位置和终止位置
+def searchRange(self, nums: List[int], target: int) -> List[int]:
+    left, right = 0, len(nums) - 1
+    start_index = end_index = -2
+    # left永远比right大1
+    # 求右边界，=放在<上，此时right是右边界的准确值，left比真实右边界right大1
+    while left <= right:
+        mid = left + (right - left) // 2
+        if nums[mid] <= target:
+            left = mid + 1
+            end_index = left
+        else:
+            right = mid - 1
+
+    # 求左边界，=放在>上，此时left是左边界的准确值，right比真实左边界left小1
+    left, right = 0, len(nums) - 1
+    while left <= right:
+        mid = left + (right - left) // 2
+        if nums[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+            start_index = right
+    if start_index == -2 or end_index == -2: return [-1, -1]
+    if end_index - start_index > 1: return [start_index + 1, end_index - 1]
+    return [-1, -1]
+
+
+# 偶数在偶位置，奇数在奇位置， 双指针
+def sortArrayByParity_while(nums: List[int]) -> List[int]:
+    # left只走奇数位置，right只走偶数位置，所以位置奇偶不用判断
+    left, right = 0, 1
+    while left < len(nums) and right < len(nums):
+        if nums[left] % 2 != 0:
+            while nums[right] % 2 != 0:
+                right += 2
+            nums[left], nums[right] = nums[right], nums[left]
+        else:
+            left += 2
+    return nums
+
+
+# for循环效率更高
+def sortArrayByParity_for(nums: List[int]) -> List[int]:
+    oddIndex = 1
+    for i in range(0, len(nums), 2):  # 步长为2
+        if nums[i] % 2:  # 偶数位遇到奇数
+            while nums[oddIndex] % 2:  # 奇数位找偶数
+                oddIndex += 2
+            nums[i], nums[oddIndex] = nums[oddIndex], nums[i]
+    return nums
+

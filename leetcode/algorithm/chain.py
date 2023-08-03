@@ -197,17 +197,25 @@ class Solution:
             cur = tmp
         return pre
 
+
+    # 双指针法简洁版
+    def reverseList2(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        node = None
+        while head:
+            head.next, head, node = node, head.next, head
+        return node
+
     # 两两交换相邻节点 [1, 2, 3, 4]---[2, 1, 4, 3]
     def swapPairs(self, head: Optional[ListNode]) -> Optional[ListNode]:
         dummyHead = ListNode(0, head)
         cur = dummyHead
+        # 交换1，2必须知道1之前的节点，不然节点2就会丢失
         while cur.next and cur.next.next:
             tmp = cur.next  # 1
-            tmp1 = cur.next.next  # 2
-            cur.next.next = cur.next.next.next  # 1->3
-            tmp1.next = tmp  # 2->1
-            cur.next = tmp1  # head->2
-            cur = cur.next.next
+            cur.next = cur.next.next  # 0--2
+            tmp.next = cur.next.next  # 1--3
+            cur.next.next = tmp  # 2-1
+            cur = tmp
         return dummyHead.next
 
     # 删除链表中倒数第n个元素
