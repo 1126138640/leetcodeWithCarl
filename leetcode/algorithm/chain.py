@@ -85,8 +85,7 @@ class Solution:
 
     # 判断两个链表是否有交点【双指针解法】
     def getIntersectionNode(self, headA: ListNode, headB: ListNode) -> ListNode:
-        tmp1 = headA
-        tmp2 = headB
+        tmp1, tmp2 = headA, headB
         while tmp1 != tmp2:
             tmp1 = tmp1.next if tmp1 else headB
             tmp2 = tmp2.next if tmp2 else headA
@@ -246,3 +245,34 @@ class Solution:
                     fast = fast.next
                 return slow
         return None
+
+    # 重排链表 L0 → L1 → … → Ln - 1 → Ln ------》L0 → Ln → L1 → Ln - 1 → L2 → Ln - 2 → …
+    # 先用快慢指针截断链表，跨指针每次走两步，慢指针走一步
+    # 再把后半部分链表倒序重排，重排后的链表逐个插入
+    def reorderList(self, head: Optional[ListNode]) -> None:
+        slow = fast = head
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+        node = None
+        while slow:
+            slow.next, slow, node = node, slow.next, slow
+        dummyHead = head
+        while node.next:  # node.next 否则会有循环
+            tmp1 = node.next
+            node.next = dummyHead.next
+            dummyHead.next = node
+            node, dummyHead = tmp1, dummyHead.next.next
+
+    # 判断链表是否有环
+    def hasCycle(self, head: Optional[ListNode]) -> bool:
+        slow = fast = head
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+            if slow == fast:
+                return True
+        return False
+
+    #
+

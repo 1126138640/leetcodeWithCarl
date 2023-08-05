@@ -161,3 +161,35 @@ def topKFrequent(nums: [int], k: int) -> [int]:
     for i in sorted(hashDict.items(), key=lambda x: x[1], reverse=True)[0:k]:
         res.append(i[0])
     return res
+
+
+# 同构字符串，egg//app；title//paper
+def isIsomorphic(s: str, t: str) -> bool:
+    if len(s) != len(t): return False
+    hasharr = {}
+    for i in range(len(s)):
+        if s[i] in hasharr.keys():
+            if hasharr[s[i]] != t[i]:
+                return False
+        else:
+            if t[i] in hasharr.values():
+                return False
+            hasharr[s[i]] = t[i]
+    return True
+
+
+# 查找共用字符 ["bella","label","roller"]---['e', 'l', 'l']
+def commonChars(words: [str]) -> [str]:
+    hasharr = [[0 for _ in range(26)] for _ in range(len(words))]
+    res = []
+    for i in range(len(words)):
+        for j in range(len(words[i])):
+            hasharr[i][ord(words[i][j]) - ord('a')] += 1
+    for j in range(len(hasharr[0])):
+        tmp = 100
+        for i in range(len(hasharr)):
+            # 找最小值
+            tmp = min(hasharr[i][j], tmp)
+        for k in range(tmp):
+            res.append(chr(j + ord('a')))
+    return res
