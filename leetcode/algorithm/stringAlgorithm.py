@@ -82,3 +82,80 @@ def repeatedSubstringPattern1(self, s: str) -> bool:
     print(ss.find(s))
     return ss.find(s) != -1
 
+
+# 长键按入, typed中要包括name，且顺序相同，不能有额外字母，name和naamee符合，naame和namme不符合
+def isLongPressedName_my(name: str, typed: str) -> bool:
+    ptr_name = ptr_typed = 0
+    while ptr_name < len(name) and ptr_typed < len(typed):
+        # 相等均向前，否则typed向前
+        if name[ptr_name] == typed[ptr_typed]:
+            ptr_typed += 1
+            ptr_name += 1
+        else:
+            if ptr_typed == 0 or typed[ptr_typed] != name[ptr_name - 1]:
+                return False
+            ptr_typed += 1
+    # name比typed长
+    if ptr_name < len(name):
+        return False
+    # typed比name长
+    for i in range(ptr_typed, len(typed), 1):
+        if typed[i] != name[-1]:
+            return False
+    return True
+
+
+def isLongPressedName_Carl(name: str, typed: str) -> bool:
+    i = j = 0
+    while i < len(name) and j < len(typed):
+        # If the current letter matches, move as far as possible
+        if typed[j] == name[i]:
+            # 把两边重复的走完
+            while j + 1 < len(typed) and typed[j] == typed[j + 1]:
+                j += 1
+                # special case when there are consecutive repeating letters
+                if i + 1 < len(name) and name[i] == name[i + 1]:
+                    i += 1
+            j += 1
+            i += 1
+        else:
+            return False
+    return i == len(name) and j == len(typed)
+
+
+# 比较含删除键的字符串
+# https://leetcode.cn/problems/backspace-string-compare/description/
+def backspaceCompare(s: str, t: str) -> bool:
+    # 倒序
+    s_index, t_index = len(s) - 1, len(t) - 1
+    s_backspace, t_backspace = 0, 0  # 记录s,t的#数量
+    while s_index >= 0 or t_index >= 0:  # 使用or，以防长度不一致
+        while s_index >= 0:  # 从后向前，消除s的#
+            if s[s_index] == '#':
+                s_index -= 1
+                s_backspace += 1
+            else:
+                if s_backspace > 0:
+                    s_index -= 1
+                    s_backspace -= 1
+                else:
+                    break
+        while t_index >= 0:  # 从后向前，消除t的#
+            if t[t_index] == '#':
+                t_index -= 1
+                t_backspace += 1
+            else:
+                if t_backspace > 0:
+                    t_index -= 1
+                    t_backspace -= 1
+                else:
+                    break
+        if s_index >= 0 and t_index >= 0:  # 后半部分#消除完了，接下来比较当前位的值
+            if s[s_index] != t[t_index]:
+                return False
+        # 长度不一
+        elif s_index >= 0 or t_index >= 0:  # 一个字符串找到了待比较的字符，另一个没有，返回False
+            return False
+        s_index -= 1
+        t_index -= 1
+    return True

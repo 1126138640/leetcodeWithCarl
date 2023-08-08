@@ -141,6 +141,7 @@ def searchRange(self, nums: List[int], target: int) -> List[int]:
         else:
             right = mid - 1
             start_index = right
+    # target不在nums中
     if start_index == -2 or end_index == -2: return [-1, -1]
     if end_index - start_index > 1: return [start_index + 1, end_index - 1]
     return [-1, -1]
