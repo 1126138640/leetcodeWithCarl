@@ -273,3 +273,15 @@ def predictPartyVictory(self, senate: str) -> str:
                 flag -= 1
     # 循环结束之后，R和D只能有一个为true
     return "Radiant" if R else "Dire"
+
+
+# 分割平衡字符串
+def balancedStringSplit(s: str) -> int:
+    flag = res = 0
+    for i in range(len(s)):
+        if s[i] == "R":
+            flag += 1
+        else:
+            flag -= 1
+        if flag == 0: res += 1
+    return res

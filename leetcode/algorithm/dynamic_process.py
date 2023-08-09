@@ -31,11 +31,10 @@ origin_price = [4, 5, 8, 9, 10, 17, 17, 20, 24, 30, 33]
 # 使用最小花费爬楼梯
 # 到达第i位置花费为dp[i]
 # cost[0,1,2,2], dp[0,0,0,1,2]
-def minCostClimbingStairs(self, cost: [int]) -> int:
-    dp = [0 for i in range(len(cost) + 1)]
+def minCostClimbingStairs(cost: [int]) -> int:
+    dp = [0 for _ in range(len(cost) + 1)]
     for i in range(2, len(cost) + 1):
         dp[i] = min(dp[i - 1] + cost[i - 1], dp[i - 2] + cost[i - 2])
-    print(dp)
     return dp[len(cost)]
 
 
@@ -86,11 +85,12 @@ def uniquePathsWithObstacles(obstacleGrid: [[int]]) -> int:
 
 # 将整数n拆分成k个数，求这k个数乘积的最大值
 def integerBreak(n: int) -> int:
-    dp = [1 for i in range(n + 1)]
+    dp = [1 for _ in range(n + 1)]
+    # 从3开始，n=2、1结果均为1
     for i in range(3, n + 1):
         summary = 1
         for j in range(1, i // 2 + 1):
-            summary = max(max(j * dp[i - j], j * (i - j)), summary)
+            summary = max([j * dp[i - j], j * (i - j), summary])
         dp[i] = summary
     return dp[n]
 

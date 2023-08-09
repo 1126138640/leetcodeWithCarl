@@ -62,7 +62,7 @@ def backTracking_letterCombinations(digits: str, index_nums: int, path: str, res
         path = path[:-1]  # 回溯
 
 
-# 组合求和, candidates中的数字可重复使用，无序[2,2,3] = [2,3,2]
+# 组合求和, candidates中的数字可重复使用，无序;[2,2,3] = [2,3,2]
 def combinationSum(candidates: List[int], target: int) -> List[List[int]]:
     res = []
     candidates.sort()
@@ -76,7 +76,7 @@ def backTracking_combinationSum(candidates: [int], target: int, path: [int], res
     if currentSum == target:
         res.append(path[:])
         return
-    for i in range(startIndex, len(candidates)):
+    for i in range(startIndex, len(candidates)):  # 正是因为无序，所以不能重复取数
         if currentSum + candidates[i] > target: break  # 提前剪枝
         path.append(candidates[i])
         currentSum += candidates[i]
@@ -395,7 +395,7 @@ def backTracking_solveNQueens(n: int, path: [], res: [[str]], row: int, record: 
             path[row][i] = '.'
 
 
-def is_valid(self, column: int, row: int, n, record: [int]):
+def is_valid(column: int, row: int, n, record: [int]):
     for i in range(row):
         if column in record or column == record[i] + row - i or column == record[i] - row + i:
             return False
