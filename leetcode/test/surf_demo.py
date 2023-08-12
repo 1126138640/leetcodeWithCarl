@@ -1,34 +1,32 @@
 import cv2
 
-img = cv2.imread("feature.jpg")
-img = cv2.resize(img, (136 * 3, 76 * 3))
-cv2.imshow("original", img)
+def detect_dark_traffic_lights(image):
+    # 将图像转换为HSV颜色空间
+    hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
-gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    # 设置红色信号灯的颜色范围
+    lower_red = (0, 100, 100)
+    upper_red = (10, 255, 255)
 
-# 使用SIFT
-sift = cv2.xfeatures2d.SIFT_create()
-keypoints, descriptor = sift.detectAndCompute(gray, None)
+    # 在图像中提取红色区域
+    red_mask = cv2.inRange(hsv_image, lower_red, upper_red)
 
-cv2.drawKeypoints(image=img, outImage=img, keypoints=keypoints,
-                  flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS,
-                  color=(51, 163, 236))
-cv2.imshow("SIFT", img)
+    # 计算红色区域的像素总数
+    red_pixels = cv2.countNonZero(red_mask)
 
-# 使用SURF
-img = cv2.imread("feature.jpg")
-img = cv2.resize(img, (136 * 3, 76 * 3))
+    # 如果红色像素数量较低，则信号灯暗灭
+    if red_pixels < 100:
+        return True
+    else:
+        return False
 
-surf = cv2.xfeatures2d.SURF_create()
-keypoints, descriptor = surf.detectAndCompute(gray, None)
+# 读取测试图像
+image = cv2.imread('traffic_light.jpg')
 
-cv2.drawKeypoints(image=img, outImage=img, keypoints=keypoints,
-                  flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS,
-                  color=(51, 163, 236))
-cv2.imshow("SURF", img)
+# 进行信号灯暗灭检测
+is_dark = detect_dark_traffic_lights(image)
 
-img = cv2.imread("feature.jpg")
-img = cv2.resize(img, (136 * 3, 76 * 3))
-
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+if is_dark:
+    print("交通信号灯暗灭")
+else:
+    print("交通信号灯正常工作")

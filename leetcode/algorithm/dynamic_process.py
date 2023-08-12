@@ -1,4 +1,5 @@
 import copy
+import sys
 import time
 from math import floor
 
@@ -629,6 +630,73 @@ def longestPalindromeSubseq(s: str) -> int:
     return dp[0][-1]
 
 
+# 最长回文子串
+# 动态规划法，
+def longestPalindrome(s: str) -> str:
+    dp = [[False for i in range(len(s))] for j in range(len(s))]
+    left = right = 0
+    for i in range(len(s)-1, -1, -1):
+        for j in range(i, len(s)):
+            if s[i] == s[j]:
+                if j-i <= 1 or dp[i+1][j-1]:
+                    dp[i][j] = True
+            if dp[i][j] and j-i > right-left:
+                right = j
+                left =i
+
+    return s[left:right+1]
+
+
+# 最长回文子串
+# 双指针法
+def longestPalindrome_continue(s: str) -> str:
+    def findPoint(left: int, right: int, s: str):
+        while left >= 0 and right < len(s) and s[left] == s[right]:
+            left -= 1
+            right += 1
+        # 此时按理说应返回left+1，right-1，返回right最后计算串的时候不需要再+1
+        return left + 1, right
+
+    def compareLength(left: int, right: int, start: int, end: int):
+        if right - left > end - start:
+            return left, right
+        return start, end
+
+    start = end = 0
+    for i in range(len(s)):
+        # 一个值作为中心点
+        left, right = findPoint(i, i, s)
+        start, end = compareLength(left, right, start, end)
+        # 两个值作为中心点
+        left, right = findPoint(i, i + 1, s)
+        start, end = compareLength(left, right, start, end)
+    return s[start:end]
+
+
+# 分割回文串【给你一个字符串 s，请你将 s 分割成一些子串，使每个子串都是回文。分割次数最少】
+def minCut(s: str) -> int:
+    # 先求动归数组
+    isPalindromic = [[False for _ in range(len(s))] for _ in range(len(s))]
+    for i in range(len(s) - 1, -1, -1):
+        for j in range(i, len(s)):
+            if s[i] == s[j] and (j - i <= 1 or isPalindromic[i + 1][j - 1]):
+                isPalindromic[i][j] = True
+    # dp[i]表示0-i的子串，最少切几次
+    dp = [0] + [sys.maxsize for _ in range(1, len(s))]
+    for i in range(1, len(s)):
+        # 一直都是回文的，不需要切
+        if isPalindromic[0][i]:
+            dp[i] = 0
+            continue
+        # 不是回文的，则求最小的切割次数
+        for j in range(i):
+            if isPalindromic[j + 1][i]:
+                # i是不断递增的，dp[i]是动态改变的
+                # dp[j]已知，则只需要看isPalindromic[j + 1][i]是否为回文
+                dp[i] = min(dp[i], dp[j] + 1)
+    return dp[-1]
+
+
 # 摆动序列【动态规划】
 def wiggleMaxLength_dp(nums):
     # 设 dp 状态dp[i][0]，表示考虑前 i 个数，第 i 个数作为山峰的摆动子序列的最长长度
@@ -656,7 +724,6 @@ def extend(self, s, i, j, n):
 
 
 # 求最长回文子串的长度
-
 
 
 def isSubsequence_doublePointer(s: str, t: str) -> bool:
