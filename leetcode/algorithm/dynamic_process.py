@@ -525,28 +525,6 @@ def lengthOfLIS(nums: [int]) -> int:
     return result
 
 
-# 最长递增子序列的个数
-def findNumberOfLIS(nums: List[int]) -> int:
-    if len(nums) <= 1: return len(nums)
-    dp = [1 for _ in range(len(nums))]  # i之前（包括i）最长递增子序列的长度为dp[i]
-    count = [1 for _ in range(len(nums))]  # 以nums[i]为结尾的最长递增子序列的长度
-    sum = maxCount = 0
-    for i in range(1, len(nums)):
-        for j in range(i):
-            if nums[i] > nums[j]:
-                # 出现新的最长递增子序列
-                if dp[j] + 1 > dp[i]:
-                    dp[i] = dp[j] + 1
-                    count[i] = count[j]
-                # 出现相同长度的另一个递增子序列
-                elif dp[j] + 1 == dp[i]:
-                    count[i] += count[j]
-            maxCount = max(dp[i], maxCount)
-    for i in range(len(nums)):
-        if maxCount == dp[i]: sum += count[i]
-    return sum
-
-
 # 最长连续递增子序列
 def findLengthOfLCIS(self, nums: [int]) -> int:
     dp = [1 for _ in range(len(nums))]
