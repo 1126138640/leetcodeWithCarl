@@ -515,7 +515,7 @@ def maxProfit5(prices: [int], fee: int) -> int:
 
 # 最长递增子序列
 def lengthOfLIS(nums: [int]) -> int:
-    dp = [1 for _ in range(len(nums))]  # i之前（包括i）最长递增子序列的长度为dp[i]
+    dp = [1 for _ in range(len(nums))]  # 以dp[i]为结尾的最长递增子序列，并不一定是最终结果
     result = 1
     for i in range(1, len(nums)):
         for j in range(0, i):
