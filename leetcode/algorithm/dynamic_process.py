@@ -525,7 +525,7 @@ def lengthOfLIS(nums: [int]) -> int:
 
 
 # 最长递增子序列的个数
-def findNumberOfLIS(nums: List[int]) -> int:
+def findNumberOfLIS(nums: [int]) -> int:
     if len(nums) <= 1: return len(nums)
     dp = [1 for _ in range(len(nums))]  # i之前（包括i）最长递增子序列的长度为dp[i]
     count = [1 for _ in range(len(nums))]  # 以nums[i]为结尾的最长递增子序列的长度
@@ -738,6 +738,68 @@ def minDistance_th(word1: str, word2: str) -> int:
                 # 增删改均只需要一次操作
                 dp[i][j] = min([dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]]) + 1
     return dp[-1][-1]
+
+
+# 前缀和系列
+def prefixSum(nums: [int], start: int, end: int) -> int:
+    dp = [nums[0]] + [0 for _ in range(1, len(nums))]
+    # 初始化
+    for i in range(1, len(nums)):
+        dp[i] = dp[i-1] + nums[i]
+    # 计算0-r之间的最长前缀
+    # 从start到end的前缀和 dp[end]-dp[start-1]
+    length = end - start + 1
+    res = 0
+    for i in range(length, len(nums)):
+        res = max(res, dp[i]-dp[i-length])
+    return res
+
+
+# 二维前缀和
+def twoDimensionPrefixSum(metrix: [[int]], start: (int, int), end: (int, int)) -> int:
+    dp = [[0 for _ in range(len(metrix[0]))] for _ in range(len(metrix))]
+    # 二维DP的构造
+    for i in range(len(metrix)):
+        for j in range(len(metrix[0])):
+            if j == 0 or i == 0:
+                dp[i][j] = metrix[i][j]
+            else:
+                dp[i][j] = dp[i-1][j] + dp[i][j-1] - dp[i-1][j-1] + metrix[i][j]
+    # 从起点到终点的矩形区域的前缀和
+    res = 0
+    if start[0] > 0 and start[1] > 0:
+        res = dp[end[0]][end[1]] - dp[start[0]-1][end[1]] - dp[end[0]][start[1]-1] + dp[start[0]-1][start[1]-1]
+    if start[0] == 0:
+        res = dp[end[0]][end[1]] - dp[start[0]][start[1] - 1]
+    if start[1] == 0:
+        res = dp[end[0]][end[1]] - dp[start[0] - 1][end[1]]
+    if start[0] == start[1] == 0:
+        res = dp[end[0]][end[1]]
+    return res
+
+
+# 分割二维矩形，使得两部分差值最小
+def splitMetrix(metrix: [[int]]) -> int:
+    summery = 0
+    for i in metrix:
+        summery += sum(i)
+    dp = [[0 for _ in range(len(metrix[0]))] for _ in range(len(metrix))]
+    for i in range(len(metrix)):
+        for j in range(len(metrix[0])):
+            if i == 0 or j == 0:
+                dp[i][j] = metrix[i][j]
+            else:
+                dp[i][j] = dp[i-1][j] + dp[i][j-1] - dp[i-1][j-1] + metrix[i][j]
+    res = float('INF')
+    for i in range(len(metrix)):
+        for j in range(len(metrix[0])):
+            res = min(res, abs(summery - 2*dp[i][j]))
+    return res
+
+
+metrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+res = splitMetrix(metrix)
+print(res)
 
 
 def cache_func(func):

@@ -6,7 +6,7 @@ def sparse_tensor(tensor):
     # 获取非零元素的索引和值
     indices = np.nonzero(tensor)
     values = tensor[indices]
-
+    print(type(indices))
     # 处理高于二维的张量
     if tensor.ndim > 2:
         # 递归处理每个维度
@@ -19,12 +19,12 @@ def sparse_tensor(tensor):
         col_indices = np.concatenate([sub_sparse.col for sub_sparse in sub_sparse_tensors])
         values = np.concatenate([sub_sparse.data for sub_sparse in sub_sparse_tensors])
         shape = tensor.shape
-        sparse_tensor = coo_matrix((values, (row_indices, col_indices)), shape=shape)
+        sparse_tensors = coo_matrix((values, (row_indices, col_indices)), shape=shape)
     else:
         # 创建稀疏矩阵
-        sparse_tensor = coo_matrix((values, indices), shape=tensor.shape)
+        sparse_tensors = coo_matrix((values, indices), shape=tensor.shape)
 
-    return sparse_tensor
+    return sparse_tensors
 
 
 def sparse_dot_product(tensor1, tensor2):
@@ -55,4 +55,4 @@ if __name__ == '__main__':
     # 打印稀疏化后的张量
     print("稀疏化后的张量：")
     print(tensor)
-    print(sparse_tensor(tensor))
+    print(sparse_dot_product(tensor, tensor))
