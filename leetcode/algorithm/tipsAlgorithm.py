@@ -170,4 +170,3 @@ def sortArrayByParity_for(nums: List[int]) -> List[int]:
                 oddIndex += 2
             nums[i], nums[oddIndex] = nums[oddIndex], nums[i]
     return nums
-
